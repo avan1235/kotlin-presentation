@@ -1,0 +1,1058 @@
+\documentclass[hyperref={pdfpagelabels=false},xcolor={dvipsnames},compress]{beamer}
+\usepackage{lmodern}
+\usepackage{listings}
+\lstdefinelanguage{Kotlin}{
+    comment=[l]{//},
+    commentstyle={\color{gray}\ttfamily},
+    emph={filter, first, firstOrNull, forEach, lazy, map, mapNotNull, println, until, downTo, TODO},
+    emphstyle={\color{OrangeRed}\ttfamily},
+    keywords={!in, !is, abstract, actual, annotation, as, as?, break, by, catch, value, class, companion, const, constructor, continue, crossinline, data, delegate, do, dynamic, else, enum, expect, external, false, field, file, final, finally, for, fun, get, if, import, in, infix, init, inline, inner, interface, internal, is, lateinit, noinline, null, object, open, operator, out, override, package, param, private, property, protected, public, receiveris, reified, return, return@, sealed, set, setparam, super, suspend, tailrec, this, throw, true, try, typealias, typeof, val, var, vararg, when, where, while},
+    keywordstyle={\color{NavyBlue}\bfseries\ttfamily},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]",
+    morestring=[s]{"""*}{*"""},
+    ndkeywords={@Deprecated, @JvmField, @JvmInline, @JvmName, @JvmOverloads, @JvmStatic, @JvmSynthetic, Array, Byte, UByte, Double, Float, Int, UInt, Integer, Iterable, Long, Runnable, Short, String, Any, Unit, Nothing},
+    ndkeywordstyle={\color{BurntOrange}\ttfamily},
+    sensitive=true,
+    stringstyle={\color{ForestGreen}\ttfamily},
+    identifierstyle={\ttfamily},
+    basicstyle={\ttfamily},
+    numberstyle={\ttfamily},
+}
+\lstset{language=Kotlin,showstringspaces=false,basicstyle=\small\ttfamily}
+\usetheme{Berlin}
+
+\AtBeginSection[]{
+    \begin{frame}
+        \vfill
+        \centering
+        \begin{beamercolorbox}[sep=8pt,center,shadow=false,rounded=false]{title}
+            \usebeamerfont{title}\insertsectionhead\par%
+        \end{beamercolorbox}
+        \vfill
+    \end{frame}
+}
+
+\title{Kotlin - aimed to make developers happier}
+\author{Maciej Procyk}
+\date{\includegraphics[width=75pt]{images/happy.png}\\November 15, 2021}
+\begin{document}
+
+    \logo{\includegraphics[width=40pt]{images/logo.png}}
+
+    {
+        \setbeamertemplate{logo}{}
+        \setbeamertemplate{headline}{}
+        \begin{frame}
+            \maketitle
+        \end{frame}
+    }
+
+
+    \begin{frame}
+        \frametitle{Table of contents}
+        \tableofcontents
+    \end{frame}
+
+
+    \section{Introduction}
+
+    \subsection{Hello Kotlin}
+
+    \begin{frame}[fragile]{Say "Hello World" and go home}
+
+        \begin{exampleblock}{HelloWorld.kt}
+            \begin{lstlisting}
+fun main() = println("Hello, Kotlin World")
+            \end{lstlisting}
+        \end{exampleblock}
+    \end{frame}
+
+    \subsection{Main ideas}
+
+    \begin{frame}{Short history background}
+        \begin{itemize}
+            \uncover<1->{\item unveiled in 2011 (being designed from 2010) by JetBrains}
+            \uncover<2->{\item goal: compile as quickly as Java but offer as rich features as Scala}
+            \uncover<3->{\item \alt<3>{you guess a name source (think of Java)}{named for the island Kotlin near Saint Petersburg}}
+            \uncover<5->{\item announced as official Android language in 2017}
+            \uncover<6->{\item becomes multiplatform programming language}
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Main design goals}
+        \begin{itemize}
+            \item \uncover<1->{concise, object-oriented language}\uncover<2->{, "better" than Java} \uncover<3->{but fully operable with it}
+            \uncover<4->{\item enable fast turnaround for developer}
+            \uncover<5->{\item provide many ways to reuse your code}
+            \uncover<6->{\item expressiveness - new syntax features}
+            \uncover<7->{\item scalability - introduce coroutines for JVM}
+            \uncover<8->{\item enable systems migration step-by-step}
+            \uncover<9->{\item provide great tooling and easy learning curve}
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Use cases}
+        \begin{itemize}
+            \uncover<1->{\item main Android language}
+            \uncover<2->{\item server-side development}
+            \uncover<3->{\item multiplatform (mobile) programming}
+            \uncover<4->{\item frontend development}
+            \uncover<5->{\item being introduced to data science}
+            \uncover<6->{\item even tried in competitive programming}
+        \end{itemize}
+    \end{frame}
+
+
+    \section{Language}
+
+    \subsection{Introduction}
+
+    \begin{frame}[fragile]{"Simplify" our greeting}
+        \begin{exampleblock}
+            <1->{HelloWorldKt.kt}
+            \begin{lstlisting}
+object HelloWorldKt {
+  @JvmStatic
+  fun main(args: Array<String>): Unit {
+      val name: String? = readLine()
+      if (name == null) return
+      System.out.println("Hello " + name)
+  }
+}
+            \end{lstlisting}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Imperative approach}
+        \begin{exampleblock}
+            <1->{HelloWorld.kt}
+            \begin{lstlisting}
+fun main() {
+  val name = readLine() ?: return
+  println("Hello $name")
+}
+            \end{lstlisting}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Declarative approach}
+        \begin{exampleblock}
+            <1->{HelloWorld.kt}
+            \begin{lstlisting}
+fun main() = readLine()
+  ?.let { println("Hello $it") }
+  ?: Unit
+            \end{lstlisting}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}{Basic language assumptions}
+        \begin{itemize}
+            \item \uncover<1->{items are }\uncover<2->{\texttt{public}}\uncover<1->{ by default}
+            \item \uncover<3->{classes and methods are }\uncover<4->{\texttt{final}}\uncover<3->{ by default}
+            \item \uncover<5->{there is no }\uncover<6->{\texttt{static}}\uncover<5->{ concept in mind}
+            \uncover<7->{(but the abstraction of \texttt{companion object} exists)}
+            \item \uncover<9->{emphasis of }\uncover<10->{null-ability}\uncover<9->{ for every type }\uncover<10->{with \texttt{?}}
+            \item \uncover<11->{no primitive types}\uncover<12->{ but quite a lot of optimizations including effective usage of them}
+            \item \uncover<13->{\texttt{final} variables used by default}\uncover<14->{ with the keyword \texttt{val}}
+            \item \uncover<15->{high usage of type inference in different contexts (\texttt{val}s and \texttt{var}s used as fields and variables definitions)}
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Program structure}
+        \begin{itemize}
+            \item functions as first-class citizens (functional types of type \texttt{(A, B) -> C}) \pause
+            \item not only \texttt{class}es and \texttt{interface}s, but also \texttt{object}s (and \texttt{sealed} versions of them) and \texttt{value class}es \pause
+            \item no \texttt{package private} visibility but \texttt{public}, \texttt{protected}, \texttt{private} and \texttt{internal} are used \pause
+            \item statically typed variables with: \pause
+            \begin{itemize}
+                \item number types like \texttt{Byte}, \texttt{Short}, \texttt{Int}, \texttt{Long}, (with unsigned versions) \texttt{Float}, \texttt{Double} (all with explicit conversion) \pause
+                \item \texttt{String}, \texttt{Char} and \texttt{Boolean} types \pause
+                \item \texttt{Array<T>} and specialized versions for primitives \texttt{IntArray}, \texttt{DoubleArray}, \ldots \pause
+                \item ends on \texttt{Any} and includes also \texttt{null}able types
+            \end{itemize}
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}[fragile]{Null safety - elvis operator}
+        \begin{exampleblock}{ElvisOperator.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+val beOrNot: String? = "be"
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+val answerSize: Int? = beOrNot?.length
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<3->
+                \begin{lstlisting}
+val decided: String = beOrNot ?: "not"
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<4->
+                \begin{lstlisting}
+val sureAnswerSize: Int = beOrNot!!.length
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+
+        \begin{onlyenv}<5->
+            also supported in safe casting with \texttt{as?} operator
+        \end{onlyenv}
+    \end{frame}
+
+    \begin{frame}[fragile]{Lambdas definitions}
+        Kotlin introduces new syntax for lamdas i.e. $\lbrace$ $\rbrace$
+        \begin{exampleblock}{Lambdas.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+val hasSense: (Int) -> Boolean = { it == 42 }
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+val beep = { println("beep") }
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<3->
+                \begin{lstlisting}
+val printWarn = { msg: Any -> 
+  println("WARN: $msg")
+}
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<4->
+                \begin{lstlisting}
+beep(); printWarn(hasSense(42))
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Expression controlled flow}
+        \begin{exampleblock}{FlowFeatures.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+val state = if (readLine() == "42") "alive"
+            else "dead"
+
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+val mood =
+  when (val grade = (2..6).random()) {
+    in 3..4 -> "uff... I passed with $grade"
+    5, 6 -> "happy getting $grade"
+    else -> "sad because of $grade"
+  }
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Named loops and scopes}
+        \begin{exampleblock}{FlowFeatures.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+val friends = listOf("Alice", "Bob", "Carol")
+
+for (friend in friends)
+  println("Hello $friend")
+
+friends@ for (friend in friends) {
+  for (i in 0..3) {
+    println("Hello $friend")
+    if (friend.last() == 'a') break@friends
+  }
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Fast return from flow}
+        \begin{exampleblock}{FlowFeatures.kt}
+            \begin{onlyenv}<1-1>
+                \begin{lstlisting}
+while (true) {
+  readLine()
+    ?.let(::println)
+    ?: break
+}
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2-2>
+                \begin{lstlisting}
+while (true) readLine()?.let(::println) ?: break
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<3->
+                \begin{lstlisting}
+while (true) {
+  readLine()
+    ?.let(::println)
+    ?: break
+}
+
+val name = readLine() ?: return
+val surname = readLine() ?: return
+println("Your full name is $name $surname")
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \subsection{Functions}
+
+    \begin{frame}[fragile]{Functions in Kotlin}
+        \begin{exampleblock}{BasicFunctions.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+fun add(a: Int, b: Int): Int {
+  return a + b
+}
+
+fun sub(a: Int, b: Int) = a - b
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+val op = ::add
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        \uncover<2->{Kotlin also supports functions references that belong to one of the \texttt{KFunction<out R>} subtypes}
+    \end{frame}
+
+    \begin{frame}[fragile]{Default arguments}
+        \begin{exampleblock}{SyntaxFeaturesArgs.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+fun fib(
+  idx: UInt,
+  curr: Long = 1,
+  last: Long = 0,
+): Long =
+  if (idx == 0U) curr
+  else fib(idx - 1U, curr + last, curr)
+
+fib(idx = 42U, curr = 42, last = 1)
+fib(42U)
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Extension functions}
+        \begin{exampleblock}{ExtensionFunctions.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+// this can be omitted
+fun Any.printHash() =
+  println(hashCode())
+
+// also for final classes
+fun String.twice() = this + this
+
+"42".twice().printHash()
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        Defined as \texttt{static} functions with first hidden parameter desugared from \texttt{this}
+    \end{frame}
+
+    \begin{frame}[fragile]{Infix functions}
+        \begin{exampleblock}{InfixFunctions.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+infix fun Int.times(i: Int) = this * i
+val life = 6 times 7
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        \begin{exampleblock}
+            <2->{StdLibInfixFunctions.kt}
+            \begin{onlyenv}
+                \begin{lstlisting}
+val numberName = mapOf(
+  1 to "one",
+  2 to "two",
+)
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Operators}
+        Predefined set of operators in language like \texttt{+a, !a, a++, a..b, a + b, a in b} (and much more) that can be manually defined for every type
+        \begin{exampleblock}{OperatorFunctions.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+operator fun String.not() = this.map { 
+  if (it.isUpperCase()) it.lowercaseChar()
+  else it.uppercaseChar()
+}.joinToString("")
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+println(!"wOw")
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        \uncover<2->{and used as standard operators.}
+    \end{frame}
+
+    \begin{frame}[fragile]{High order functions}
+        \begin{exampleblock}{HighOrderFunctions.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+fun <T, U> Iterable<T>.foldLeft(
+  initAcc: U, f: (U, T) -> U
+): U {
+  var acc = initAcc
+  for (element in this) acc = f(acc, element)
+  return acc
+}
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+numbers.foldLeft(0) { acc, e -> acc + e }
+numbers.foldLeft(1, Int::times)
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        Idiomatic Kotlin code uses convention of having function parameters as last ones.
+    \end{frame}
+
+    \begin{frame}[fragile]{Generic functions}
+        \begin{exampleblock}{GenericFunctions.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+fun <T : Comparable<T>>
+    List<T>.maxOr(default: () -> T): T =
+  maxOrNull() ?: default()
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        while compiler is smart enough to usually guess all needed types
+        \begin{exampleblock}
+            <2->{GenericFunctions.kt}
+            \begin{onlyenv}
+                \begin{lstlisting}
+listOf(3, 1, 4, 1, 5).maxOr { 92 }
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Inline functions}
+        \begin{exampleblock}{InlineFunctions.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+inline fun <reified T, V>
+    Any?.letOrNull(f: (T) -> V) =
+  if (this is T) f(this) else null
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+"Kotlin".letOrNull<String, Int> { it.length }
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<3->
+                \begin{lstlisting}
+"Kotlin".letOrNull { str: String -> str.length }
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        where the function parameter can have also \texttt{crossinline} or \texttt{noinline} modifiers
+    \end{frame}
+
+    \begin{frame}[fragile]{Perform transformations on \texttt{it}}
+        \begin{exampleblock}{ItMappers.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+inline fun <T> T.also(f: (T) -> Unit): T {
+  f(this)
+  return this
+}
+
+inline fun <T, R> T.let(f: (T) -> R): R {
+  return f(this)
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Perform transformations on \texttt{it} - examples}
+        \begin{exampleblock}{ItMappers.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+val maxVal = listOf(3, 1, 4)
+  .maxOrNull()
+  .also(::println)
+
+val doubled = maxVal?.let { it * 2 }
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Perform transformations on \texttt{this}}
+        \begin{exampleblock}{ThisMappers.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+inline fun <T> T.apply(f: T.() -> Unit): T {
+  this.f()
+  return this
+}
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+val server = JettyServer().apply {
+  install(ForceHttps)
+  install(Cors)
+  start()
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Tail recursion}
+        \begin{exampleblock}{TailRecursiveFunctions.kt}
+            \begin{onlyenv}<1-1>
+                \begin{lstlisting}
+tailrec fun factorial(c: UInt, r: UInt): UInt =
+  if (c > 1U) factorial(c - 1U, r * c) else r
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+fun factorial(n: UInt): UInt {
+  tailrec fun go(c: UInt, r: UInt): UInt =
+    if (c > 1U) go(c - 1U, r * c) else r
+  return go(n, 1U)
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        Optimized by compiler to standard \texttt{while} loop pattern.
+    \end{frame}
+
+    \subsection{Classes}
+
+    \begin{frame}{Classes in Kotlin}
+        In Kotlin we can define classes similarly as in Java but also we can define:
+        \begin{itemize}
+            \pause
+            \item multiple classes in single file \pause
+            \item extension functions in classes \pause
+            \item \texttt{sealed} classes as well as \texttt{enum} classes \pause
+            \item \texttt{object}s being singleton classes \pause
+            \item \texttt{typealias}es resolved at compile-time \pause
+            \item inline classes as \texttt{value class}es \pause
+            \item \texttt{inner class}es as well as nested \texttt{class}es
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}[fragile]{Base classes}
+        \begin{exampleblock}{BasicClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+abstract class Animal constructor(
+  val color: Color, val owner: Person
+) : Comparable<Animal> {
+  enum class Color { RED, GREEN, BLUE }
+
+  override fun compareTo(other: Animal) =
+    color.compareTo(other.color)
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Data classes}
+        \begin{exampleblock}{DataClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+data class Person(val name: String, val age: Int)
+
+val alice = Person("Alice", 42)
+val equal = alice == Person("Bob", 22)
+val olderAlice = alice.copy(age = 66)
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2-2>
+                \begin{lstlisting}
+val (name, age) = alice
+println("Hello, I'm $name and I'm $age")
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<3->
+                \begin{lstlisting}
+with(alice) {
+  println("Hello, I'm $name and I'm $age")
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Example: Interpreter classes structure}
+        \begin{exampleblock}{InterpreterClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+typealias Ident = String
+typealias Env = MutableMap<Ident, Int?>
+typealias IntOp = (Int, Int) -> Int
+interface Exp { fun eval(env: Env): Int? }
+
+sealed class BinOp(val op: IntOp)
+abstract class AddOp(op: IntOp) : BinOp(op)
+abstract class MulOp(op: IntOp) : BinOp(op)
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Example: Interpreter classes structure}
+        \begin{exampleblock}{InterpreterClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+object Plus : AddOp(Int::plus)
+object Minus : AddOp(Int::minus)
+object Times : MulOp(Int::times)
+object Divide : MulOp(Int::div)
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Example: Interpreter classes structure}
+        \begin{exampleblock}{InterpreterClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+data class BinExp(
+  val l: Exp, val op: BinOp, val r: Exp
+): Exp {
+  override fun eval(env: Env): Int? {
+    val lValue = l.eval(env) ?: return null
+    val rValue = r.eval(env) ?: return null
+    return op.op(lValue, rValue)
+  }
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Example: Interpreter classes structure}
+        \begin{exampleblock}{InterpreterClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+@JvmInline
+value class NumExp(val value: Int): Exp {
+  override fun eval(env: Env): Int = value
+}
+
+data class IdentExp(val i: Ident): Exp {
+  override fun eval(env: Env): Int? = env[i]
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Example: Interpreter classes structure}
+        \begin{exampleblock}{InterpreterClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+sealed class Stmt
+class ExpStmt(val exp: Exp) : Stmt()
+class AssStmt(val i: Ident, val e: Exp) :
+  Stmt()
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Example: Interpreter classes structure}
+        \begin{exampleblock}{InterpreterClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+fun step(env: Env, stmt: Stmt) = when(stmt) {
+  is ExpStmt -> env.also {
+    println(stmt.exp.eval(it))
+  }
+  is AssStmt -> env.apply {
+    put(stmt.i, stmt.e.eval(env))
+  }
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Example: Interpreter classes structure}
+        \begin{exampleblock}{InterpreterClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+data class Program(
+  private val stmts: MutableList<Stmt>
+  = mutableListOf()
+) {
+  fun interpret(env: Env = mutableMapOf()) =
+    stmts.fold(env, ::step)
+
+  // we could stop there but...
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Example: Interpreter classes structure}
+        \begin{exampleblock}{InterpreterClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+  // let's revisit functions knowledge
+  infix fun Ident.eq(e: Exp) {
+    stmts.add(AssStmt(this, e))
+  }
+  operator fun Exp.not() {
+    stmts.add(ExpStmt(this))
+  }
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Example: Interpreter classes structure}
+        \begin{exampleblock}{InterpreterClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+operator fun Exp.plus(e: Exp) =
+  BinExp(this, Plus, e)
+operator fun Exp.times(e: Exp) = 
+  BinExp(this, Times, e)
+
+inline fun def(i: Ident) = IdentExp(i)
+inline fun num(i: Int) = NumExp(i)
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Interpreter DSL usage example}
+        \begin{exampleblock}{InterpreterClasses.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+val program = Program().apply {
+  "x" eq num(42)
+  "y" eq num(24)
+  "z" eq def("x") + def("y")
+  !def("z")
+  !(def("z") * def("u"))
+}
+program.interpret()
+println(program)
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        \uncover<2->{It was less than 100 short lines of code}\uncover<3->{ but the effect is amazing.}
+    \end{frame}
+
+    \subsection{Idioms}
+
+    \begin{frame}[fragile]{Destructuring declarations}
+        \begin{exampleblock}{PairDestructuring.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+val keyValue = "key" to Unit
+val (k, v) = keyValue
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+// which corresponds to 
+val desugaredK = keyValue.component1()
+val desugaredV = keyValue.component2()
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        \uncover<2->{where these fuctions can be defined as \texttt{operator}s and are also predefined e.g. for lists and \texttt{data class}es.}
+    \end{frame}
+
+    \begin{frame}[fragile]{Destructuring in lambdas}
+        \begin{exampleblock}{LambdaDestructuring.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+{ a -> ... } // one parameter
+{ a, b -> ... } // two parameters
+{ (a, b) -> ... } // a destructured pair
+{ (a, b), c -> ... } // pair and parameter
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Delegated properties}
+        Classes having defined \texttt{operator fun}ctions \texttt{getValue} and \texttt{setValue}
+        \begin{exampleblock}{Observables.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+import kotlin.properties.Delegates.observable
+
+class User {
+  var name: String by observable("noname") {
+    _, old, new -> println("$old -> $new")
+  }
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Delegated properties}
+        The most commonly used is probably \texttt{lazy} initializer
+        \begin{exampleblock}
+            <1->{LazyProperties.kt}
+            \begin{onlyenv}
+                \begin{lstlisting}
+class Book {
+  val description: String by lazy {
+    "value downloaded from database"
+  }
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        which in other languages usually have to be defiend manually.
+    \end{frame}
+
+    \begin{frame}[fragile]{Ranges}
+        There is only single range operator in language
+        \begin{exampleblock}{Ranges.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+val include = 1..42
+val notInclude = 1 until 42
+val down = 42 downTo 1
+val collection = listOf(1, 2, 3)
+for (i in collection.indices)
+	println("At $i got ${collection[i]}")
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+for ((i, v) in collection.withIndex())
+	println("At $i got $v")
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{"Not implemented" marker}
+        \begin{exampleblock}{TODO.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+fun `does P = NP`(): Boolean =
+  TODO("Waiting for proof")
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<3->
+                \begin{lstlisting}
+inline fun TODO(reason: String): Nothing =
+  throw NotImplementedError(
+    "An operation is not implemented: $reason")
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        \uncover<2->{Not implemented function can have proper signature. It is part of standard library, not of the language.}
+    \end{frame}
+
+    \begin{frame}[fragile]{Tricky lambda scope}
+        \begin{exampleblock}{Swap.kt}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+var a = 42
+var b = 24
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2-2>
+                \begin{lstlisting}
+val temp = a
+a = b
+b = temp
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<3->
+                \begin{lstlisting}
+a = b.also { b = a }
+// now a = 24 and b = 42
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+        \uncover<4->{as in Kotlin variables captured in the closure can be modified in the lambda. It is not used commonly as \texttt{var}s aren't used.}
+    \end{frame}
+
+
+    \section{Infrastructure}
+
+    \subsection{Kotlin Script}
+
+    \begin{frame}{Kotlin Scripts}
+        \begin{itemize}
+            \item Kotlin offers not only REPL for easy testing code but also provides mechanism of scripts \pause
+            \item they are standard source files with extension \texttt{.kts} \pause
+            \item can be run with \texttt{kotlinc} compiler but also custom solution like \texttt{kscript} exists \pause
+            \item defines the structure of \texttt{Gradle} project
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}[fragile]{Shell script}
+        \begin{exampleblock}{SimpleScript.kts}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+#!/usr/bin/env kscript
+import java.io.File
+
+val dir = args.singleOrNull() ?: "."
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+File(dir)
+  .walkTopDown()
+  .filter(File::isFile)
+  .sorted()
+  .forEach(::println)
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}[fragile]{Kotlin DSL in Gradle}
+        \begin{exampleblock}{build.gradle.kts}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+plugins {
+  kotlin("jvm") version "1.5.31"
+}
+
+// ...
+
+tasks.withType<KotlinCompile> {
+  kotlinOptions.jvmTarget = "1.8"
+}
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \subsection{Kotlin Multiplatform}
+
+    \begin{frame}{Kotlin Multiplatform}
+        \begin{itemize}
+            \item can be compiled to native executables, JavaScript files and also to WebAssembly \pause
+            \item features code sharing between all or some platforms used in project \pause
+            \item uses mechanism of \texttt{expect} and \texttt{actual} declarations \pause
+            \item reuse the multiplatform logic in common and platform-specific code (it's even
+            simpler when there are more and more multiplatform libraries)
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}[fragile]{\texttt{expect} and \texttt{actual} in action}
+        \begin{exampleblock}{Common.kts}
+            \begin{onlyenv}<1->
+                \begin{lstlisting}
+// common
+expect fun randomUUID(): String
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<2->
+                \begin{lstlisting}
+// Android
+actual fun randomUUID() = 
+  java.util.UUID.randomUUID().toString()
+                \end{lstlisting}
+            \end{onlyenv}
+            \begin{onlyenv}<3->
+                \begin{lstlisting}
+// iOS
+actual fun randomUUID(): String = 
+  platform.Foundation.NSUUID().UUIDString()
+                \end{lstlisting}
+            \end{onlyenv}
+        \end{exampleblock}
+    \end{frame}
+
+    \begin{frame}{Multi languages interoperability}
+        Kotlin Native uses LLVM backend for compiling to native binaries. It can create:
+        \begin{itemize}
+            \item executables for many platforms \pause
+            \item a static library or dynamic library with C headers for C/C++ projects \pause
+            \item an Apple framework for Swift and Objective-C projects \pause
+        \end{itemize}
+        Kotlin supports using libraries from:
+        \begin{itemize}
+            \item static and dynamic C libraries \pause
+            \item Swift and Objective-C frameworks \pause
+        \end{itemize}
+        Let's try CLion or AppCode to test these great features if you're interested.
+    \end{frame}
+
+    \begin{frame}{Kotlin Multiplatform project structure}
+        Project defines hirarchical structure of sourcesets, for which the dependency relation is defined.
+        E.g. we can have:
+        \begin{itemize}
+            \item \texttt{commonMain} source set containing all common logic \pause
+            \item \texttt{jvmMain:commonMain} code specific for JVM \pause
+            \item \texttt{jsMain:commonMain} code specific for web \pause
+            \item \texttt{desktopMain:commonMain} code specific for all desktop platforms\pause
+            \begin{itemize}
+                \item \texttt{linuxX64Main:desktopMain} code specific for Linux x64 platforms \pause
+                \item \texttt{macosX64Main:desktopMain} code specific for MacOS x64 platforms
+            \end{itemize}
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Kotlin new compiler - K2}
+        \begin{itemize}
+            \item Kotlin started with no native backend and no coroutines \pause
+            \item introduce new type inference algorithm \pause
+            \item provide new JVM and JS IR backend \pause
+            \item introducing FIR (frontend intermediate representation) \pause
+            \item goal: performance improvements, provide an API for compiler extensions
+        \end{itemize}
+    \end{frame}
+
+    \section*{Appendix}
+    \subsection*{Recommendation}
+
+    \begin{frame}{Kotlin in Action - highly recommend}
+        \centering
+        \includegraphics[width=140pt]{images/action.png}
+    \end{frame}
+
+    {
+        \setbeamertemplate{logo}{}
+        \setbeamertemplate{headline}{}
+        \begin{frame}{}
+            \centering
+            \includegraphics[width=100pt]{images/blink.png}\\\vspace{1cm}
+            \emph{\Large Thank you for your attention}
+        \end{frame}
+    }
+
+\end{document}
